@@ -1,0 +1,66 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+/**
+ * This class provides a method to calculate the square root of a BigDecimal number.
+ */
+public class SquareRootCalculator {
+
+    /**
+     * Calculates the square root of a BigDecimal number.
+     *
+     * @param number the BigDecimal number for which the square root is to be calculated
+     * @return the square root of the input number
+     * @throws IllegalArgumentException if the input number is negative
+     */
+    public static BigDecimal calculateSquareRoot(BigDecimal number) {
+        if (number.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Cannot calculate square root of a negative number.");
+        }
+
+        // Set the precision and scale
+        int scale = 20; // Adjust scale as needed for desired precision
+        BigDecimal epsilon = new BigDecimal("0.0000001"); // Adjust epsilon as needed
+
+        // Initial guess will be half of the number
+        BigDecimal guess = number.divide(new BigDecimal(2), scale, RoundingMode.HALF_UP);
+
+        // Loop until the guess is close enough to the actual square root
+        while (true) {
+            BigDecimal result = number.divide(guess, scale, RoundingMode.HALF_UP);
+            BigDecimal average = guess.add(result).divide(new BigDecimal(2), scale, RoundingMode.HALF_UP);
+
+            if (average.subtract(guess).abs().compareTo(epsilon) < 0) {
+                return average;
+            }
+
+            guess = average;
+        }
+    }
+
+    /**
+     * The main method calculates the square root of a predefined BigDecimal number
+     * and prints the result to the console.
+     *
+     * @param args command line arguments (not used)
+     */
+    public static void main(String[] args) {
+        try {
+            // Example input
+            BigDecimal number = new BigDecimal("9876543896676553432658941");
+
+            // Calculate square root
+            BigDecimal squareRoot = calculateSquareRoot(number);
+
+            // Output
+            System.out.println("Input number: " + number);
+            System.out.println("Square root: " + squareRoot);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Error: " + e.getMessage());
+        } catch (ArithmeticException e) {
+            System.err.println("Arithmetic error: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Unexpected error: " + e.getMessage());
+        }
+    }
+}
